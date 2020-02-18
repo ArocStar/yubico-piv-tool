@@ -34,8 +34,12 @@
 #include "debug.h"
 #include <stdlib.h>
 #include <string.h>
+#if defined(_WIN32)
+#include <process.h>
+#else
 #include <unistd.h>
 #include <pthread.h>
+#endif // ! _WIN32
 
 CK_BBOOL is_yubico_reader(const char* reader_name) {
   return !strncmp(reader_name, "Yubico", 6);
@@ -62,7 +66,7 @@ CK_RV noop_mutex_fn(void *mutex) {
 }
 
 CK_RV native_create_mutex(void **mutex) {
-#ifdef __WIN32
+#ifdef _WIN32
   CRITICAL_SECTION *mtx = calloc(1, sizeof(CRITICAL_SECTION));
   if (mtx == NULL) {
     return CKR_HOST_MEMORY;
@@ -100,7 +104,7 @@ CK_RV native_create_mutex(void **mutex) {
 }
 
 CK_RV native_destroy_mutex(void *mutex) {
-#ifdef __WIN32
+#ifdef _WIN32
   DeleteCriticalSection(mutex);
 #else
   pthread_mutex_destroy(mutex);
@@ -110,7 +114,7 @@ CK_RV native_destroy_mutex(void *mutex) {
 }
 
 CK_RV native_lock_mutex(void *mutex) {
-#ifdef __WIN32
+#ifdef _WIN32
   EnterCriticalSection(mutex);
 #else
   if(pthread_mutex_lock(mutex)) {
@@ -121,7 +125,7 @@ CK_RV native_lock_mutex(void *mutex) {
 }
 
 CK_RV native_unlock_mutex(void *mutex) {
-#ifdef __WIN32
+#ifdef _WIN32
   LeaveCriticalSection(mutex);
 #else
   if(pthread_mutex_unlock(mutex)) {
@@ -132,8 +136,8 @@ CK_RV native_unlock_mutex(void *mutex) {
 }
 
 CK_RV get_pid(uint64_t *pid) {
-#ifdef __WIN32
-  *pid = _getpid();
+#ifdef _WIN32
+  (int)*pid = _getpid();
 #else
   *pid = getpid();
 #endif
@@ -141,7 +145,7 @@ CK_RV get_pid(uint64_t *pid) {
 }
 
 CK_RV check_pid(uint64_t pid) {
-#ifdef __WIN32
+#ifdef _WIN32
   if(pid)
     return CKR_CRYPTOKI_ALREADY_INITIALIZED;
 #else
