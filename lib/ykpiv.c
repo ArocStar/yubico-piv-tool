@@ -1843,8 +1843,10 @@ ykpiv_rc ykpiv_import_private_key(ykpiv_state *state, const unsigned char key, u
   }
   else if (algorithm == YKPIV_ALGO_ECCP256 || algorithm == YKPIV_ALGO_ECCP384) {
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif  // 
     if ((size_t)ec_data_len >= sizeof(key_data)) {
       /* This can never be true, but check to be explicit. */
       return YKPIV_SIZE_ERROR;

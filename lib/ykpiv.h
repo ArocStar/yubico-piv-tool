@@ -40,7 +40,7 @@
 #define YKPIV_H
 
 #include <stdint.h>
-#include <stddef.h>
+//#include <stddef.h>
 #include <stdbool.h>
 
 #include "ykpiv-config.h"

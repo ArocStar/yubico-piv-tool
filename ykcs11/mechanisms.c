@@ -647,6 +647,8 @@ CK_RV check_pubkey_template(gen_info_t *gen, CK_MECHANISM_PTR mechanism, CK_ATTR
     case CKA_PRIVATE:
     case CKA_LABEL:
     case CKA_SUBJECT:
+    case CKA_EXTRACTABLE:
+    case CKA_SIGN:
       // Ignore these attributes for now
       break;
 

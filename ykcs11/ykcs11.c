@@ -111,8 +111,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(
 #if YKCS11_DBG
   verbose = YKCS11_DBG;
 #else
+#if !defined (_WIN32)
   const char *dbg = getenv("YKCS11_DBG");
   verbose = dbg ? atoi(dbg) : 0;
+#else
+#if defined (_DEBUG)
+  verbose = 1
+#else
+  verbose = 0
+#endif
+#endif
 #endif
 
   DIN;
@@ -1369,11 +1377,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(
   CK_BYTE          id;
   CK_BYTE_PTR      value;
   CK_ULONG         value_len;
-  CK_BYTE_PTR      p;
-  CK_BYTE_PTR      q;
-  CK_BYTE_PTR      dp;
-  CK_BYTE_PTR      dq;
-  CK_BYTE_PTR      qinv;
+  CK_BYTE_PTR      p = NULL;
+  CK_BYTE_PTR      q = NULL;
+  CK_BYTE_PTR      dp = NULL;
+  CK_BYTE_PTR      dq = NULL;
+  CK_BYTE_PTR      qinv = NULL;
   CK_ULONG         p_len;
   CK_ULONG         q_len;
   CK_ULONG         dp_len;

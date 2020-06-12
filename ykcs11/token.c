@@ -36,7 +36,7 @@
 #include "openssl_utils.h"
 
 #include <stdbool.h>
-#include "../common/util.h"
+#include "../tool/util.h"
 
 #define MIN_RSA_KEY_SIZE 1024
 #define MAX_RSA_KEY_SIZE 2048
@@ -315,8 +315,8 @@ CK_RV token_login(ykpiv_state *state, CK_USER_TYPE user, CK_UTF8CHAR_PTR pin, CK
       return CKR_DEVICE_ERROR;
     }
   } else if(pin_len != YKPIV_MGM_KEY_LEN || user != CKU_SO) {
-    DBG("PIN is wrong length");
-    return CKR_ARGUMENTS_BAD;
+    DBG("Key is wrong length");
+    return CKR_PIN_LEN_RANGE;
   }
 
   if (user == CKU_SO) {
@@ -327,7 +327,7 @@ CK_RV token_login(ykpiv_state *state, CK_USER_TYPE user, CK_UTF8CHAR_PTR pin, CK
       if(ykpiv_hex_decode((char *)pin, pin_len, key, &key_len) != YKPIV_OK) {
         DBG("Failed decoding key");
         OPENSSL_cleanse(key, key_len);
-        return CKR_ARGUMENTS_BAD;
+        return CKR_PIN_INVALID;
       }
     } else {
       ykpiv_config cfg;
@@ -339,7 +339,7 @@ CK_RV token_login(ykpiv_state *state, CK_USER_TYPE user, CK_UTF8CHAR_PTR pin, CK
 
       if(cfg.mgm_type != YKPIV_CONFIG_MGM_PROTECTED || cfg.protected_data_available != true) {
         DBG("Device configuration invalid, no PIN-protected MGM key available");
-        return CKR_USER_PIN_NOT_INITIALIZED;
+        return CKR_PIN_INVALID;
       }
 
       memcpy(key, cfg.protected_data, sizeof(key));
@@ -350,9 +350,12 @@ CK_RV token_login(ykpiv_state *state, CK_USER_TYPE user, CK_UTF8CHAR_PTR pin, CK
       DBG("Failed to authenticate: %s", ykpiv_strerror(res));
       OPENSSL_cleanse(key, sizeof(key));
 
-      if(res == YKPIV_AUTHENTICATION_ERROR)
+      if(res == YKPIV_WRONG_PIN)
         return CKR_PIN_INCORRECT;
         
+      if(res == YKPIV_PIN_LOCKED)
+        return CKR_PIN_LOCKED;
+
       return CKR_DEVICE_ERROR;
     }
 
@@ -380,7 +383,11 @@ CK_RV token_generate_key(ykpiv_state *state, CK_BYTE algorithm, CK_BYTE key, CK_
     case YKPIV_ALGO_RSA2048:
       if(ykpiv_get_version(state, version, sizeof(version)) == YKPIV_OK) {
         int major, minor, build;
+#if defined (_WIN32)
+        int match = sscanf_s(version, "%d.%d.%d", &major, &minor, &build);
+#else
         int match = sscanf(version, "%d.%d.%d", &major, &minor, &build);
+#endif 
         if(match == 3 && major == 4 && (minor < 3 || (minor == 3 && build < 5))) {
           DBG("On-chip RSA key generation on this YubiKey has been blocked.");
           DBG("Please see https://yubi.co/ysa201701/ for details.");

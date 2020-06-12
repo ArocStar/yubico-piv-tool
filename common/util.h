@@ -35,7 +35,9 @@
 
 #include <openssl/x509.h>
 
-#include "../tool/cmdline.h"
+#if defined (USE_CMDLINE)
+#include "cmdline.h"
+#endif // USE_CMDLINE
 
 enum file_mode {
   INPUT_TEXT,

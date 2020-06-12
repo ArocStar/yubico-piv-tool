@@ -28,28 +28,19 @@
  *
  */
 
-#include "ykpiv-config.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
-//#include <arpa/inet.h>
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
 #include "utils.h"
 #include "token.h"
 #include "mechanisms.h"
 #include "debug.h"
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>
-//#include <pthread.h>
-
-
-
+#if defined(_WIN32)
+#include <Windows.h>
+#include <process.h>
+#else
+#include <unistd.h>
+#include <pthread.h>
+#endif // ! _WIN32
 
 CK_BBOOL is_yubico_reader(const char* reader_name) {
   return !strncmp(reader_name, "Yubico", 6);
@@ -147,7 +138,7 @@ CK_RV native_unlock_mutex(void *mutex) {
 
 CK_RV get_pid(uint64_t *pid) {
 #ifdef _WIN32
-  *pid = _getpid();
+  (int)*pid = _getpid();
 #else
   *pid = getpid();
 #endif
