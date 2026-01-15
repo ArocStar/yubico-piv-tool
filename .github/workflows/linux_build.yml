@@ -5,7 +5,7 @@ on: [push]
 
 jobs:
 
-  ununtu_builds:
+  ubuntu_builds:
     name: Build with various configurations
     runs-on: ${{ matrix.os }}
     strategy:
@@ -127,7 +127,7 @@ jobs:
           make
           make test
 
-  ubuntu2004:
+  no_compression_build:
     name: Build without zlib
     runs-on: ubuntu-latest
     steps:

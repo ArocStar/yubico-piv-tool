@@ -1,5 +1,14 @@
 yubico-piv-tool NEWS -- History of user-visible changes.        -*- outline -*-
 
+* Version 2.7.3 (released 2026-01-20)
+
+** ykcs11: Add support for ECDH derivation with X25519 key
+** lib: Improve usability with Windows
+** lib: Improve integration with minidriver
+** lib: Fix length calculation when importing RSA keys
+** lib: Improve error handling when no readers are available
+** build: Upgrade CMake minimum required version to 3.15
+
 * Version 2.7.2 (released 2025-07-30)
 
 ** ykcs11: Handle a silent verification failure when opening a PKCS11 session. No impact on authentication enforcement for the usage of credentials on the YubiKey
