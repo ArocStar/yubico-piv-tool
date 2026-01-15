@@ -1,3 +1,14 @@
+yubico-piv-tool (2.7.3) stable; urgency=medium
+
+  * ykcs11: Add support for ECDH derivation with X25519 key
+  * lib: Improve usability with Windows
+  * lib: Improve integration with minidriver
+  * lib: Fix length calculation when importing RSA keys
+  * lib: Improve error handling when no readers are available
+  * build: Upgrade CMake minimum required version to 3.15
+
+ -- Aveen Ismail <aveen.ismail@yubico.com>  Tue, 20 Jan 2026 03:34:57 +0100
+
 yubico-piv-tool (2.7.2) stable; urgency=medium
 
   * ykcs11: Handle a silent verification failure when opening a PKCS11 session. No impact on authentication enforcement for the usage of credentials on the YubiKey
